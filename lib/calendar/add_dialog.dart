@@ -203,16 +203,16 @@ class AddEventForm {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          calendarController.addEvent(
-                            fields[0]["controller"].text,
-                            fields[1]["controller"].text,
-                            fields[2]["controller"].text,
-                           // isMultiDay.value,
-                            isMultiDay.value ? "" : fields[4]["controller"].text,
-                            isMultiDay.value ? fields[5]["controller"].text : "",
-                            isMultiDay.value ? fields[6]["controller"].text : "",
-                            isMultiDay.value ? "" : fields[7]["controller"].text,
-                          );
+                          // calendarController.addEvent(
+                          //   fields[0]["controller"].text,
+                          //   fields[1]["controller"].text,
+                          //   fields[2]["controller"].text,
+                          //  // isMultiDay.value,
+                          //   isMultiDay.value ? "" : fields[4]["controller"].text,
+                          //   isMultiDay.value ? fields[5]["controller"].text : "",
+                          //   isMultiDay.value ? fields[6]["controller"].text : "",
+                          //   isMultiDay.value ? "" : fields[7]["controller"].text,
+                          // );
                           Get.back();
                         },
                         child: const Text("Add Event"),

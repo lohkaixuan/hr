@@ -7,13 +7,15 @@ import 'package:hr/bottom%20nav/bottom_nav_controller.dart';
 import 'package:hr/calendar/calendar_controller.dart';
 import 'package:hr/route/page.dart';
 import 'package:hr/storage/storage.dart';
+import 'package:hr/universal/GlobalOverlay.dart';
 import 'package:hr/universal/dialog.dart';
 import 'package:hr/universal/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
   await GetStorage.init(); // Initialize local storage
+  Get.put(GlobalOverlay()); // Calendar controller
+
   Get.put(ShowDialog());
   Get.put(AuthController()); // Auth controller
   Get.put(CalendarController()); // Calendar controller

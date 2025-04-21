@@ -39,6 +39,43 @@ class ApiService {
     }
   }
 
+  // Future<EventsResponse> getEvents() async {
+  //       print("events api");   
+
+  //   try {
+  //     var response = await _dioClient.dio.get('/events/get',
+  //       data: {},
+  //     );
+  //     print("event api Response: $response");
+
+  //   // Print the type and value of the 'event_id' field of the first event in the response
+  //   print("event_id type: ${response.data['data'][0]['event_id'].runtimeType}");
+  //   print("event_id value: ${response.data['data'][0]['event_id']}");
+  //     return EventsResponse.fromJson(response.data);
+  //   } on DioException catch (e) {
+  //     throw ApiException(e.response?.statusCode, e.response?.data['message'] ?? 'Something went wrong');
+  //   }
+  // }
+  
+  Future<EventResponse> getEvent() async {
+    print("Fetching events...");
+
+    try {
+      // Make the GET request to the API
+      var response = await _dioClient.dio.get('/event/get',);
+      print("Response: ${response.data}");
+      print("Response runtimeType: ${response.data.runtimeType}");
+
+      // Decode the response data into the EventResponse model
+      return EventResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      // Handle any errors that occur during the request
+      throw ApiException(
+          e.response?.statusCode, e.response?.data['message'] ?? 'Something went wrong');
+    }
+  }
+
+
   // Future<RegisterResponse> register(email, password, name, phone, role) async {
   //   try {
   //     var response = await _dioClient.dio.post("/auth/register", 

@@ -22,6 +22,7 @@ class DioClient {
         String? token = await Storage().getAuthToken(); // ✅ Load stored token
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
+          print("token api = $token");
         }
         return handler.next(options);
       },

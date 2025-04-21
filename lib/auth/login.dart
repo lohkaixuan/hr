@@ -1,45 +1,50 @@
-import 'dart:async';  // Import for Timer
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr/auth/auth_controller.dart';
+import 'package:hr/universal/GlobalOverlay.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
-
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  bool _isPasswordVisible = false; // Toggle for password visibility
-  bool _isButtonDisabled = false; // Track button disable state
-  Timer? _timer; // Timer to reset button state
+  final GlobalOverlay _global = Get.find();
   final AuthController _auth = Get.find();
   final List<Map<String, dynamic>> field = [
-    {"label": "Gmail", "controller": TextEditingController(), "isPassword": false},
+    {"label": "Email", "controller": TextEditingController(), "isPassword": false},
     {"label": "Password", "controller": TextEditingController(), "isPassword": true},
   ];
+  bool _isPasswordVisible = false;
 
-  // Function to handle login
-  void _handleLogin() {
-    if (_isButtonDisabled) return; // Prevent multiple clicks
+  // Map to store validation results
+  final Map<String, String?> _validationErrors = {
+    "Email": null,
+    "Password": null,
+  };
 
-    setState(() {
-      _isButtonDisabled = true; // Disable button on click
-    });
+  // Method to validate email
+  String? _validateEmail(String value) {
+    const emailPattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+    final regex = RegExp(emailPattern);
+    if (value.isEmpty) {
+      return "Email cannot be empty";
+    } else if (!regex.hasMatch(value)) {
+      return "Enter a valid email";
+    }
+    return null;
+  }
 
-    _auth.login(
-      field[0]["controller"].text.trim(),
-      field[1]["controller"].text.trim(),
-    );
-
-    // Reset button after 30 seconds
-    _timer = Timer(Duration(seconds: 30), () {
-      setState(() {
-        _isButtonDisabled = false; // Re-enable the button after 30 seconds
-      });
-    });
+  // Method to validate password
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return "Password cannot be empty";
+    } else if (value.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    return null;
   }
 
   @override
@@ -53,76 +58,99 @@ class _LoginState extends State<Login> {
         title: Text("Login", style: textTheme.titleLarge),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: AutoSizeText(
-                  "Login",
-                  style: textTheme.titleLarge, // Use themed title
-                  maxLines: 1,
-                  minFontSize: 25,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20), // Add spacing
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: AutoSizeText(
+                      "Login",
+                      style: textTheme.titleLarge,
+                      maxLines: 1,
+                      minFontSize: 2,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-              // TextFields for email and password
-              ...field.map((field) => Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: TextField(
-                      controller: field["controller"],
-                      obscureText: field["isPassword"] ? !_isPasswordVisible : false,
-                      decoration: InputDecoration(
-                        labelText: field["label"],
-                        labelStyle: textTheme.labelLarge, // Use themed label style
-                        border: const OutlineInputBorder(),
-                        suffixIcon: field["isPassword"]
-                            ? IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: colorScheme.primary, // Match theme
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                              )
-                            : null,
+                  // Loop through fields and create TextFields dynamically
+                  ...field.map((field) {
+                    final fieldLabel = field["label"];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: TextField(
+                        controller: field["controller"],
+                        obscureText: field["isPassword"] ? !_isPasswordVisible : false,
+                        decoration: InputDecoration(
+                          labelText: fieldLabel,
+                          labelStyle: textTheme.labelLarge,
+                          border: const OutlineInputBorder(),
+                          // Use the label to get the corresponding error message
+                          errorText: _validationErrors[fieldLabel], // Dynamically get the error text
+
+                          suffixIcon: field["isPassword"]
+                              ? IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: colorScheme.primary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+
+                  const SizedBox(height: 20),
+
+                  // Login Button
+                  SizedBox(
+                    width: 120,
+                    child: ElevatedButton(
+                      onPressed: _global.buttonIsClick.value
+                          ? null
+                          : () {
+                              final email = field[0]["controller"].text.trim();
+                              final password = field[1]["controller"].text.trim();
+
+                              // Validate both email and password
+                              setState(() {
+                                _validationErrors["Email"] = _validateEmail(email);
+                                _validationErrors["Password"] = _validatePassword(password);
+                              });
+
+                              // If there's no validation error, call login
+                              if (_validationErrors.values.every((e) => e == null)) {
+                                _auth.login(email, password);
+                              }
+                            },
+                      style: theme.elevatedButtonTheme.style,
+                      child: AutoSizeText(
+                        "Log in",
+                        style: textTheme.bodyLarge!.copyWith(color: Colors.white),
+                        maxLines: 1,
+                        minFontSize: 14,
                       ),
                     ),
-                  )),
-
-             
-
-              const SizedBox(height: 20), // Add spacing
-
-              // Login button
-              SizedBox(
-                width: 120, // Set your desired width
-                child: ElevatedButton(
-                  onPressed: _isButtonDisabled ? null : _handleLogin, // Disable if button is disabled
-                  style: theme.elevatedButtonTheme.style, // Use the themed button style
-                  child: _isButtonDisabled
-                      ? CircularProgressIndicator(color: Colors.white) // Show loading indicator
-                      : AutoSizeText(
-                          "Log in",
-                          style: textTheme.bodyLarge!.copyWith(color: Colors.white),
-                          maxLines: 1,
-                          minFontSize: 14,
-                        ),
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          _global.overlay(),
+        ],
       ),
     );
   }
