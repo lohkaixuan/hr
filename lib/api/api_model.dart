@@ -258,4 +258,24 @@ class EventResponse {
     );
   }
 }
+
+class EventsResponse {
+  final String status;
+  final String message;
+  final List<Events> eventList;
+
+  EventsResponse({
+    required this.status,
+    required this.message,
+    required this.eventList,
+  });
+
+  factory EventsResponse.fromJson(Map<String, dynamic> json) {
+    return EventsResponse(
+      status: json['status'],
+      message: json['message'],
+      eventList: List<Events>.from(json['data'].map((x) => Events.fromJson(x))),
+    );
+  }
+}
 //
