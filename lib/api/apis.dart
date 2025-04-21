@@ -68,7 +68,25 @@ class ApiService {
 
       // Decode the response data into the EventResponse model
       return EventResponse.fromJson(response.data);
-    } on DioException catch (e) {
+    } on DioException catch (e) { 
+      // Handle any errors that occur during the request
+      throw ApiException(
+          e.response?.statusCode, e.response?.data['message'] ?? 'Something went wrong');
+    }
+  }
+
+  Future<EventsResponse> getEvents() async {
+    print("Fetching events...");
+
+    try {
+      // Make the GET request to the API
+      var response = await _dioClient.dio.get('/events/get',);
+      print("Response: ${response.data}");
+      print("Response runtimeType: ${response.data.runtimeType}");
+
+      // Decode the response data into the EventResponse model
+      return EventsResponse.fromJson(response.data);
+    } on DioException catch (e) { 
       // Handle any errors that occur during the request
       throw ApiException(
           e.response?.statusCode, e.response?.data['message'] ?? 'Something went wrong');
