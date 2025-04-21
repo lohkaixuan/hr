@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "340849477224",
+    "firebase_url": "https://hr-calendar-3e19c-default-rtdb.firebaseio.com",
+    "project_id": "hr-calendar-3e19c",
+    "storage_bucket": "hr-calendar-3e19c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340849477224:android:0326c33d30e2a24faa9ddd",
+        "android_client_info": {
+          "package_name": "com.example.hr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK7YmR24KpFSFirPgRt5Y90E7ra7QoJXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
